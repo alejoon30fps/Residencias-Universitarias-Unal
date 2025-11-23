@@ -2,6 +2,7 @@ public class Estudiante {
     private int pbm;
     private String nombre;
     private String correo;
+    private long id;
 
     public Estudiante(String nombre, int pbm, String correo) {
         this.pbm = pbm;
@@ -22,6 +23,10 @@ public class Estudiante {
         return correo;
     }
 
+    public long getId() {
+        return id;
+    }
+
     // SETTERS
     public void setPbm(int pbm) {
         this.pbm = pbm;
@@ -33,5 +38,9 @@ public class Estudiante {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }
