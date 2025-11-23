@@ -2,36 +2,83 @@ public class MinHeap<T extends Comparable<T>> {
 
     private Object[] heap;
     private int size;
+    private int capacity=10;
 
     public MinHeap(int capacity) {
+        this.capacity = capacity;
         this.heap = new Object[capacity];
         this.size = 0;
     }
 
-    public void insert(T value) {
-        if (size == heap.length) expand();
-        heap[size] = value;
+    public int size() {
+        return size;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    private T get(int idx) {
+        return (T) heap[idx];
+    }
+
+    public void insert(T valor) {
+        if (size == capacity) resize();      
+        heap[size] = valor;
         siftUp(size);
         size++;
     }
 
     public T extractMin() {
-        if (size == 0) return null;
+        if (isEmpty()) return null;
 
-        T min = (T) heap[0];
+        T min = get(0);
         heap[0] = heap[size - 1];
         size--;
         siftDown(0);
-
         return min;
+    }
+
+    public boolean remove(T valor) {
+        int idx = indexOf(valor);
+        if (idx == -1) return false;
+
+        heap[idx] = heap[size - 1];
+        size--;
+
+        siftUp(idx);
+        siftDown(idx);
+
+        return true;
+    }
+
+    private int indexOf(T valor) {
+        for (int i = 0; i < size; i++) {
+            if (get(i).compareTo(valor) == 0) return i;
+        }
+        return -1;
+    }
+
+    public boolean changeKey(T viejo, T nuevo) {
+        
+        int idx = indexOf(viejo);
+        if (idx == -1) return false;
+
+        heap[idx] = nuevo;
+
+        siftUp(idx);
+        siftDown(idx);
+
+        return true;
     }
 
     private void siftUp(int idx) {
         while (idx > 0) {
             int parent = (idx - 1) / 2;
 
-            T child = (T) heap[idx];
-            T par   = (T) heap[parent];
+            T child = get(idx);
+            T par   = get(parent);
 
             if (child.compareTo(par) >= 0) break;
 
@@ -42,38 +89,34 @@ public class MinHeap<T extends Comparable<T>> {
 
     private void siftDown(int idx) {
         while (true) {
-            int left = 2 * idx + 1;
-            int right = 2 * idx + 2;
-            int smallest = idx;
+            int izq = 2 * idx + 1;
+            int der = 2 * idx + 2;
+            int menor = idx;
 
-            if (left < size) {
-                T l = (T) heap[left];
-                T c = (T) heap[smallest];
-                if (l.compareTo(c) < 0) smallest = left;
-            }
+            if (izq < size && get(izq).compareTo(get(menor)) < 0) menor = izq;
+            if (der < size && get(der).compareTo(get(menor)) < 0) menor = der;
 
-            if (right < size) {
-                T r = (T) heap[right];
-                T c = (T) heap[smallest];
-                if (r.compareTo(c) < 0) smallest = right;
-            }
+            if (menor == idx) break;
 
-            if (smallest == idx) break;
-
-            swap(idx, smallest);
-            idx = smallest;
+            swap(idx, menor);
+            idx = menor;
         }
     }
 
     private void swap(int a, int b) {
-        Object tmp = heap[a];
+        Object temp = heap[a];
         heap[a] = heap[b];
-        heap[b] = tmp;
+        heap[b] = temp;
     }
 
-    private void expand() {
-        Object[] newArr = new Object[heap.length * 2];
-        System.arraycopy(heap, 0, newArr, 0, heap.length);
-        heap = newArr;
+    private void resize() {
+        capacity *= 2;
+        Object[] nuevo = new Object[capacity];
+
+        for (int i = 0; i < size; i++) {
+            nuevo[i] = heap[i];
+        }
+
+        heap = nuevo;
     }
 }
