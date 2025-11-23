@@ -15,7 +15,7 @@ El sistema permite registrar estudiantes, consultarlos por ID, modificar datos, 
 
 ---
 
-## Lenguaje y Tecnologías
+## Lenguaje y Estructuras
 - **Lenguaje principal:** Java  (POO)
 - **Estructuras de datos usadas:**  
   - Hash Table → acceso O(1) por ID  
