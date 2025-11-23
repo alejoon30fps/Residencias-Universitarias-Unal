@@ -1,4 +1,4 @@
-public class Estudiante {
+public class Estudiante implements Comparable<Estudiante> {
     private int pbm;
     private String nombre;
     private String correo;
@@ -42,5 +42,10 @@ public class Estudiante {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    @Override
+    public int compareTo(Estudiante otro) {
+        return Integer.compare(this.pbm, otro.pbm);
     }
 }
