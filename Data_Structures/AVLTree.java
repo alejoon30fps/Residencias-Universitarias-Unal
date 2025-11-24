@@ -68,7 +68,7 @@ public class AVLTree<T extends Comparable<T>> {
     }
 
     // -----------------------------
-    // Inserción pública
+    // Inserción 
     // -----------------------------
     public void insert(T key) {
         root = insertRec(root, key);
@@ -144,7 +144,7 @@ public class AVLTree<T extends Comparable<T>> {
     }
 
     // -----------------------------
-    // Eliminación pública
+    // Eliminación 
     // -----------------------------
     public void delete(T key) {
         root = deleteRec(root, key);
