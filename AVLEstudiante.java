@@ -84,6 +84,95 @@ public class AVLEstudiante {
 
         return nodo;
     }
+
+    // ----------------------------------------------------------------------
+    // Operación de Borrar 
+    // ----------------------------------------------------------------------
+    
+    public void remove(Estudiante estudiante) {
+        raiz = eliminar(raiz, estudiante);
+    }
+
+    private Nodo eliminar(Nodo nodo, Estudiante estudiante) {
+        if (nodo == null) {
+            return null;
+    }
+    // variable comparable 
+    int cmp = estudiante.compareTo(nodo.estudiante);
+
+    // 1. Buscar el nodo a eliminar
+    if (cmp < 0) {
+        nodo.izquierdo = eliminar(nodo.izquierdo, estudiante);
+    } else if (cmp > 0) {
+        nodo.derecho = eliminar(nodo.derecho, estudiante);
+    } else {
+
+        //         CASO 1: Nodo hoja o con un solo hijo 
+        if (nodo.izquierdo == null || nodo.derecho == null) {
+            Nodo temp = (nodo.izquierdo != null) ? nodo.izquierdo : nodo.derecho;
+
+            // Caso: sin hijos
+            if (temp == null) {
+                return null;
+            }
+
+            // Caso: un hijo
+            nodo = temp;
+        } else {
+
+            //         CASO 2: Nodo con dos hijos 
+            Nodo sucesor = minValueNode(nodo.derecho);
+            nodo.estudiante = sucesor.estudiante;
+            nodo.derecho = eliminar(nodo.derecho, sucesor.estudiante);
+        }
+    }
+
+    // Si quedó vacío tras borrar
+    if (nodo == null) {
+        return null;
+    }
+
+    //       Recalcular altura 
+    actualizarAltura(nodo);
+
+    //         Rebalanceo 
+    int fb = getFactorBalanceo(nodo);
+    // LL
+    if (fb > 1 && getFactorBalanceo(nodo.izquierdo) >= 0) {
+        return rotarDerecha(nodo);
+    }
+
+    // LR
+    if (fb > 1 && getFactorBalanceo(nodo.izquierdo) < 0) {
+        nodo.izquierdo = rotarIzquierda(nodo.izquierdo);
+        return rotarDerecha(nodo);
+    }
+
+    // RR
+    if (fb < -1 && getFactorBalanceo(nodo.derecho) <= 0) {
+        return rotarIzquierda(nodo);
+    }
+
+    // RL
+    if (fb < -1 && getFactorBalanceo(nodo.derecho) > 0) {
+        nodo.derecho = rotarDerecha(nodo.derecho);
+        return rotarIzquierda(nodo);
+    }
+
+    return nodo;
+}
+
+/**
+ * Devuelve el nodo con el valor mínimo del subárbol.
+ * Es un metodo auxiliar para el metodo de delete
+ */
+private Nodo minValueNode(Nodo nodo) {
+    Nodo actual = nodo;
+    while (actual.izquierdo != null) {
+        actual = actual.izquierdo;
+    }
+    return actual;
+}
     
     // ----------------------------------------------------------------------
     // Operación de Búsqueda (Modificada)
@@ -184,6 +273,27 @@ public class AVLEstudiante {
     private int altura(Nodo nodo) {
         return (nodo == null) ? 0 : nodo.altura;
     }
+
+
+    // ----------------------------------------------------------------------
+    // Operación de camnbiar el Valor de un nodo (Implicita cuando se cambia el valor en las demas estructuras)
+    // ----------------------------------------------------------------------
+    public boolean changeKey(Estudiante viejo, Estudiante nuevo) {
+    // 1. Verificar que el viejo existe
+    Estudiante encontrado = buscar(viejo);
+    if (encontrado == null) {
+        return false;
+    }
+
+        // Se emplean metodos anteriormente ralizados    
+    // 2. Eliminar el viejo
+    remove(viejo);
+    // 3. Insertar el nuevo
+    insertar(nuevo);
+
+    return true;
+}
+
 
 }
 
