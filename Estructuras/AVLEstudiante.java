@@ -1,3 +1,5 @@
+package Estructuras;
+
 public class AVLEstudiante {
     private Nodo raiz;
     
@@ -282,7 +284,7 @@ private Nodo minValueNode(Nodo nodo) {
     // ----------------------------------------------------------------------
     // Operación de camnbiar el Valor de un nodo (Implicita cuando se cambia el valor en las demas estructuras)
     // ----------------------------------------------------------------------
-    public boolean changeKey(Estudiante viejo, Estudiante nuevo) {
+    public boolean changeKey(Estudiante viejo,int nuevoPbm) {
     // 1. Verificar que el viejo existe
     Estudiante encontrado = buscar(viejo);
     if (encontrado == null) {
@@ -292,23 +294,66 @@ private Nodo minValueNode(Nodo nodo) {
         // Se emplean metodos anteriormente ralizados    
     // 2. Eliminar el viejo
     remove(viejo);
+
+    encontrado.setPbm(nuevoPbm);
     // 3. Insertar el nuevo
-    insertar(nuevo);
+    insertar(encontrado);
 
     return true;
 }
 
     public void printInOrder() {
-    printInOrder(raiz);
-    System.out.println();
-}
+        printInOrder(raiz);
+        System.out.println();
+    }
 
-private void printInOrder(Nodo nodo) {
-    if (nodo == null) return;
-    printInOrder(nodo.izquierdo);
-    System.out.print(nodo.estudiante.getPbm() + " ");
-    printInOrder(nodo.derecho);
-}
+    private void printInOrder(Nodo nodo) {
+        if (nodo == null) return;
+        printInOrder(nodo.izquierdo);
+        System.out.print(nodo.estudiante.getPbm() + " ");
+        printInOrder(nodo.derecho);
+    }
+
+    public String[] listaInOrder(UniversalHashTable aceptados) {
+        // Inicializa el array de dos posiciones: [0] = Aceptados, [1] = No Aceptados
+        String[] listaCompleta = {"", ""}; 
+        
+        // Inicia el recorrido recursivo
+        recorrerListaInOrder(raiz, aceptados, listaCompleta);
+        
+        return listaCompleta;
+    }
+
+/**
+ * Método recursivo para recorrer el AVL In-Order (Izquierda-Nodo-Derecha)
+ * y clasificar los estudiantes en dos listas.
+ */
+    private void recorrerListaInOrder(Nodo nodo, UniversalHashTable aceptados, String[] listaCompleta) {
+        if (nodo == null) {
+            return;
+        }
+
+        // 1. Recorre subárbol Izquierdo
+        recorrerListaInOrder(nodo.izquierdo, aceptados, listaCompleta); 
+
+        // 2. Procesa el Nodo Actual (Estudiante del AVL)
+        Estudiante estudianteAVL = nodo.estudiante; 
+        
+        // Verifica si este estudiante existe en la HashTable de aceptados usando su ID como clave.
+        // La clave usada en get debe ser el mismo tipo que se usa para almacenar en la tabla.
+        Estudiante estudianteEnHash = (Estudiante) aceptados.get(estudianteAVL.getId()); 
+
+        if (estudianteEnHash != null) {
+            // El estudiante está en la HashTable: Aceptado.
+            listaCompleta[0] += estudianteAVL.toString() + "\n";
+        } else {
+            // El estudiante NO está en la HashTable: No Aceptado.
+            listaCompleta[1] += estudianteAVL.toString() + "\n";
+        }
+
+        // 3. Recorre subárbol Derecho
+        recorrerListaInOrder(nodo.derecho, aceptados, listaCompleta); 
+    }
 
 
 }
