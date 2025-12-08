@@ -13,13 +13,15 @@ public class Residencia {
     private int cupos;
 
     public Residencia(){
+        cupos=16; // cargo predeterminado de cupos
         ordenPrioridad= new AVLEstudiante();
-        colaPrioridad= new MinHeap<Estudiante>();
+        colaPrioridad= new MinHeap<Estudiante>(cupos);
         estudiantesPorID= new UniversalHashTable<Estudiante>();
         aceptados=new UniversalHashTable<Estudiante>();
-        cupos=16; // cargo predeterminado de cupos
+        
     }
 
+    @SuppressWarnings("unchecked")
     public void registrarEstudiante(String nombre, int pbm, String correo){
         Estudiante nuevoEstudiante=new Estudiante(nombre, pbm, correo);
         ordenPrioridad.insertar(nuevoEstudiante);
@@ -31,12 +33,14 @@ public class Residencia {
         return estudiantesPorID.get(id).toString();
     }
 
+    @SuppressWarnings("unchecked")
     public void changeValue(int nuevoPbm,int idEstudiante){
         Estudiante cambioEstudiante= (Estudiante) estudiantesPorID.get(idEstudiante);
         ordenPrioridad.changeKey(cambioEstudiante, nuevoPbm); //dentro de este metodo cambiamos el valor del pbm
-        colaPrioridad.changeKey(cambioEstudiante);//aqui simplemente actualizamos
+        colaPrioridad.changeKey(cambioEstudiante, cambioEstudiante);//aqui simplemente actualizamos el mismo objeto pero con atributos modificados
     }
 
+    @SuppressWarnings("unchecked")
     public void asigCupos(){
         Estudiante cupo;
         while(cupos!=0){
@@ -56,4 +60,34 @@ public class Residencia {
         return true;
     }
 
+    public boolean eliminarEstudiante(long id) {
+
+        // 1. Buscar estudiante en la HashTable (acceso O(1))
+        int key = Long.valueOf(id).hashCode();
+        Estudiante estudiante = (Estudiante) estudiantesPorID.get(key);
+
+
+        if (estudiante == null) {
+            System.out.println(" No existe un estudiante con ID " + id);
+            return false;
+        }
+
+        // 2. Eliminar del Heap
+        boolean heapOK = colaPrioridad.remove(estudiante);
+
+
+        // 3. Eliminar del AVL
+        boolean avlOK = ordenPrioridad.remove((Estudiante) estudiante);
+
+        // 4. Eliminar de la tabla hash
+        boolean hashOK = estudiantesPorID.remove(id);
+
+
+        System.out.println("\n--- RESULTADOS ELIMINACIÓN ---");
+        System.out.println("AVL:  " + avlOK);
+        System.out.println("HEAP: " + heapOK);
+        System.out.println("HASH: " + hashOK);
+
+        return heapOK && avlOK && hashOK;
+    }
 }
