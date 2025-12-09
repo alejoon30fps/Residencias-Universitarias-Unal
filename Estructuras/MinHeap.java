@@ -1,3 +1,4 @@
+package Estructuras;
 public class MinHeap<T extends Comparable<T> & getAndStIdHeap<T>> {
     
     // El tipo T debe ser Comparable (para ordenar) Y debe implementar getAndStIdHeap 
@@ -83,17 +84,23 @@ public class MinHeap<T extends Comparable<T> & getAndStIdHeap<T>> {
 
         // 1. Guarda el elemento mínimo (raíz).
         T min = get(0);
+        T ultimo = get(size - 1);
         
         // 2. Mueve el último elemento a la posición de la raíz.
-        heap[0] = heap[size - 1];
+        heap[0] = ultimo;
+        if (ultimo != null) {
+            ultimo.setIndexHeap(0);
+        }
         
         // 3. Reduce el tamaño. El elemento mínimo se pierde.
+        heap[size - 1] = null; // Opcional: Limpia la referencia para GC.
         size--;
 
         // 4. Mueve el nuevo elemento en la raíz hacia abajo para restaurar la propiedad.
         siftDown(0);
         
         // 5. Devuelve el mínimo extraído.
+        min.setIndexHeap(-1); // Marca como eliminado.
         return min;
     }
 
@@ -110,13 +117,24 @@ public class MinHeap<T extends Comparable<T> & getAndStIdHeap<T>> {
     public boolean remove(T valor) {
         // 1. Usa la interfaz para obtener la posición actual del elemento en O(1).
         int idx = valor.getIndexHeap();
-        if (idx == -1) return false; // El elemento no está en el Heap.
+        if (idx == -1 || idx >= size) return false; // El elemento no está en el Heap.
+        // 2. Obtiene el último elemento para reemplazar el eliminado.
+        int lastIndex = size - 1;
+        T ultimo = get(lastIndex);
 
-        // 2. Mueve el último elemento del Heap a la posición del elemento a eliminar.
-        heap[idx] = heap[size - 1];
-        
-        // 3. Reduce el tamaño. El elemento eliminado ya no es accesible.
+        // 3. Reduce el tamaño y caso especial si es el último elemento.
         size--;
+        // Si estamos eliminando el último elemento, solo lo removemos.
+        if(idx == lastIndex){
+            heap[lastIndex] = null;
+            valor.setIndexHeap(-1);
+            return true;
+        }
+        // Mover el ultimo elemento a la posición eliminada.
+        heap[idx] = ultimo;
+        ultimo.setIndexHeap(idx);
+
+        heap[lastIndex] = null; // Limpia la referencia para GC.
 
         // 4. Intenta restaurar la propiedad de Heap desde la nueva posición 'idx'.
         //    * siftUp: si el último elemento es menor que el padre.
@@ -124,9 +142,8 @@ public class MinHeap<T extends Comparable<T> & getAndStIdHeap<T>> {
         //    * siftDown: si el último elemento es mayor que alguno de los hijos.
         siftDown(idx);
 
-        // NOTA: El elemento 'valor' original debe tener su índice actualizado (e.g., a -1) 
-        // para marcarlo como fuera del Heap, si es requerido por el diseño de la interfaz.
-        
+        // 5. Se marca como eliminado estableciendo su índice a -1.
+        valor.setIndexHeap(-1);
         return true;
     }
 
