@@ -42,7 +42,7 @@ public class Residencia {
 //
     //this.colaPrioridad = nuevoHeap;
 
-    System.out.println("✔ Cupos actualizados a: " + nuevoCupo);
+    //System.out.println("✔ Cupos actualizados a: " + nuevoCupo);
 }
 
 
@@ -60,14 +60,16 @@ public class Residencia {
         return e.toString();
     }
 
-    public void changeValue(int nuevoPbm,long idEstudiante){
+    public boolean changeValue(int nuevoPbm,long idEstudiante){
         Estudiante cambioEstudiante= (Estudiante) estudiantesPorID.get(idEstudiante);
-        if(cambioEstudiante==null) return;
+        if(cambioEstudiante==null) return false;
 
         ordenPrioridad.changeKey(cambioEstudiante, nuevoPbm); //dentro de este metodo cambiamos el valor del pbm
         colaPrioridad.changeKey(cambioEstudiante, cambioEstudiante);//aqui simplemente actualizamos el mismo objeto pero con atributos modificados
 
         cambioEstudiante.setPbm(nuevoPbm);
+
+        return true;
     }
 
     public void asigCupos(){
@@ -150,10 +152,10 @@ public class Residencia {
         //}
 
 
-        System.out.println("\n--- RESULTADOS ELIMINACIÓN ---");
-        System.out.println("AVL:  " + avlOK);
-        System.out.println("HEAP: " + heapOK);
-        System.out.println("HASH: " + hashOK);
+        //System.out.println("\n--- RESULTADOS ELIMINACIÓN ---");
+        //System.out.println("AVL:  " + avlOK);
+        //System.out.println("HEAP: " + heapOK);
+        //System.out.println("HASH: " + hashOK);
 
         return heapOK && avlOK && hashOK;
     }

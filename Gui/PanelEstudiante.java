@@ -1,21 +1,22 @@
 package Gui;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import Estructuras.AVLEstudiante;
+
 import Estructuras.Estudiante;
 
+import java.awt.*;
+import java.awt.event.*;
+import Modulos.Residencia;
+
 public class PanelEstudiante extends JPanel {
-    private AVLEstudiante arbol;
     private JTextField nombreField, pbmField, correoField;
     private JTextArea resultadoArea;
+    private Residencia funciones;
 
-    public PanelEstudiante(AVLEstudiante arbol) {
-        this.arbol = arbol;
+    public PanelEstudiante(Residencia funciones) {
+        this.funciones=funciones;
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
         initUI();
     }
 
@@ -63,13 +64,7 @@ public class PanelEstudiante extends JPanel {
         btnInsertar.setForeground(Color.WHITE);
         btnInsertar.addActionListener(e -> insertarEstudiante());
 
-        JButton btnBuscar = new JButton("🔍 Buscar por PBM");
-        btnBuscar.setBackground(new Color(50, 100, 200));
-        btnBuscar.setForeground(Color.WHITE);
-        btnBuscar.addActionListener(e -> buscarPorPBM());
-
         panelBotones.add(btnInsertar);
-        panelBotones.add(btnBuscar);
         panelForm.add(panelBotones, gbc);
 
         add(panelForm, BorderLayout.CENTER);
@@ -109,10 +104,9 @@ public class PanelEstudiante extends JPanel {
                 return;
             }
 
-            Estudiante nuevo = new Estudiante(nombre, pbm, correo);
-            arbol.insertar(nuevo);
+            funciones.registrarEstudiante(nombre,pbm,correo);
 
-            resultadoArea.append("✅ Estudiante insertado: " + nuevo + "\n");
+            resultadoArea.append("✅ Estudiante insertado: " + nombre + "\n");
             limpiarCampos();
 
         } catch (NumberFormatException e) {
@@ -120,14 +114,12 @@ public class PanelEstudiante extends JPanel {
         }
     }
 
-    private void buscarPorPBM() {
+    private void listarPbm() {
         try {
             int pbm = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese PBM a buscar:"));
 
             // Crear temporal para búsqueda
-            Estudiante temp = new Estudiante("", pbm, "");
-            Estudiante encontrado = arbol.buscar(temp);
-
+            String encontrado= funciones.listarEstudiantesPorPrioridad();
             if (encontrado != null) {
                 resultadoArea.append("🔍 Encontrado: " + encontrado + "\n");
             } else {
@@ -142,8 +134,7 @@ public class PanelEstudiante extends JPanel {
         resultadoArea.setText("");
         resultadoArea.append("LISTA DE ESTUDIANTES (Ordenados por PBM)\n");
         resultadoArea.append("===========================================\n");
-        resultadoArea.append(arbol.listarPrioridad());
-        resultadoArea.append("\nTotal: " + arbol.totalNodos() + " estudiantes\n");
+        resultadoArea.append(funciones.listarEstudiantesPorPrioridad());
     }
 
     private void limpiarCampos() {

@@ -2,13 +2,14 @@ package Gui;
 
 import javax.swing.*;
 import java.awt.*;
-import Estructuras.AVLEstudiante;
+import Modulos.Residencia;
 
 public class VentanaPrincipal extends JFrame {
-    private AVLEstudiante arbolEstudiantes;
+
+    private Residencia funciones;
 
     public VentanaPrincipal() {
-        arbolEstudiantes = new AVLEstudiante();
+        funciones = new Residencia();
 
         setTitle("Sistema de Gestión de Estudiantes - AVL");
         setSize(900, 700);
@@ -22,8 +23,8 @@ public class VentanaPrincipal extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         // Solo dos pestañas
-        tabbedPane.addTab("👨‍💼 Administrador", new PanelAdmin(arbolEstudiantes));
-        tabbedPane.addTab("👨‍🎓 Estudiante", new PanelEstudiante(arbolEstudiantes));
+        tabbedPane.addTab("👨‍💼 Administrador", new PanelAdmin(funciones));
+        tabbedPane.addTab("👨‍🎓 Estudiante", new PanelEstudiante(funciones));
 
         add(tabbedPane);
     }
