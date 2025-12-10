@@ -1,4 +1,4 @@
-package Mockup;
+package Mockups;
 
 import java.io.FileWriter;
 import java.io.IOException;

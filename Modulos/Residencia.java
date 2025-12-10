@@ -6,9 +6,9 @@ import Estructuras.UniversalHashTable;
 
 public class Residencia {
 
-    private AVLEstudiante ordenPrioridad;
-    private MinHeap colaPrioridad;
-    UniversalHashTable estudiantesPorID;
+    public AVLEstudiante ordenPrioridad;
+    public MinHeap colaPrioridad;
+    public UniversalHashTable estudiantesPorID;
     private UniversalHashTable aceptados;
     private int cupos;
 
