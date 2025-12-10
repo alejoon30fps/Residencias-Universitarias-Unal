@@ -4,11 +4,11 @@
 
 ---
 
-## 📋 Descripción del Proyecto
+## Descripción del Proyecto
 
 Este software soluciona el problema de asignación de cupos limitados mediante un algoritmo de priorización dinámica. Utiliza una arquitectura híbrida de estructuras de datos para garantizar eficiencia, escalabilidad y justicia en el proceso.
 
-### 🛠️ Estructuras de Datos Implementadas
+###  Estructuras de Datos Implementadas
 * **Tabla Hash:** Para validación de unicidad y acceso rápido por ID ($O(1)$).
 * **Min-Heap:** Para la asignación prioritaria de cupos basada en el menor PBM ($O(\log n)$).
 * **Árbol AVL:** Para mantener el ordenamiento total y generar reportes ($O(\log n)$).
@@ -22,7 +22,7 @@ Para ejecutar el proyecto correctamente y realizar las pruebas de rendimiento, e
 
 ### 1. Clonar el repositorio
 ```bash
-git clone [https://github.com/alejoon30fps/Residencias-Universitarias-Unal.git](https://github.com/alejoon30fps/Residencias-Universitarias-Unal.git)
+git clone [https://github.com/alejoon30fps/Residencias-Universitarias-Unal.git](https://github.com/alejoon30fps/Residencias-Universitarias-Unal.git) ```bash
 ##  Instrucciones de Ejecución
 
 ### 2. Iniciar la Aplicación (Modo Normal)
