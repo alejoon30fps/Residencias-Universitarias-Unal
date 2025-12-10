@@ -1,113 +1,154 @@
+package Gui;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.Random;
+import java.awt.event.*;
+import Estructuras.AVLEstudiante;
+import Estructuras.Estudiante;
 
 public class PanelEstudiante extends JPanel {
+    private AVLEstudiante arbol;
+    private JTextField nombreField, pbmField, correoField;
+    private JTextArea resultadoArea;
 
-    private MinHeap<Estudiante> minHeap;
-    private UniversalHashTable<Estudiante> hashTable;
-    private AVLTree<Estudiante> avlTree;
-    private PanelAdmin panelAdminRef; // Referencia para actualizar la otra pantalla
+    public PanelEstudiante(AVLEstudiante arbol) {
+        this.arbol = arbol;
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-    private JTextField txtBusquedaID;
-    private JTextArea areaResultado;
-
-    public PanelEstudiante(MinHeap<Estudiante> heap, UniversalHashTable<Estudiante> hash, AVLTree<Estudiante> avl, PanelAdmin admin) {
-        this.minHeap = heap;
-        this.hashTable = hash;
-        this.avlTree = avl;
-        this.panelAdminRef = admin;
-
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        // --- SECCIÓN NORTE: Consulta y Testeo ---
-        JPanel panelNorte = new JPanel(new GridLayout(2, 1, 10, 10));
-
-        // 1. Panel de Búsqueda
-        JPanel busquedaPanel = new JPanel(new FlowLayout());
-        txtBusquedaID = new JTextField(15);
-        JButton btnBuscar = new JButton("Consultar Estado");
-        busquedaPanel.add(new JLabel("Ingrese su ID:"));
-        busquedaPanel.add(txtBusquedaID);
-        busquedaPanel.add(btnBuscar);
-
-        // 2. Panel de Mock Data (Testeo Masivo)
-        JPanel testPanel = new JPanel(new FlowLayout());
-        JButton btnGenerarDatos = new JButton("🧪 Generar 50 Datos de Prueba (Aleatorio)");
-        btnGenerarDatos.setBackground(new Color(220, 255, 220)); // Color verde claro
-        testPanel.add(btnGenerarDatos);
-
-        panelNorte.add(busquedaPanel);
-        panelNorte.add(testPanel);
-        add(panelNorte, BorderLayout.NORTH);
-
-        // --- SECCIÓN CENTRAL: Resultados ---
-        areaResultado = new JTextArea();
-        areaResultado.setEditable(false);
-        areaResultado.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        areaResultado.setBorder(BorderFactory.createTitledBorder("Información del Estudiante"));
-        add(new JScrollPane(areaResultado), BorderLayout.CENTER);
-
-        // --- LÓGICA (LISTENERS) ---
-
-        // A. Botón Buscar (Usa Hash Table para O(1))
-        btnBuscar.addActionListener(e -> {
-            try {
-                int idBuscado = Integer.parseInt(txtBusquedaID.getText());
-                Estudiante encontrado = hashTable.get(idBuscado);
-
-                if (encontrado != null) {
-                    areaResultado.setText("--- ESTUDIANTE ENCONTRADO ---\n\n");
-                    areaResultado.append("Nombre: " + encontrado.getNombre() + "\n");
-                    areaResultado.append("ID: " + encontrado.getId() + "\n");
-                    areaResultado.append("PBM: " + encontrado.getPbm() + "\n");
-                    areaResultado.append("Correo: " + encontrado.getCorreo() + "\n");
-                } else {
-                    areaResultado.setText("No se encontró ningún estudiante con el ID: " + idBuscado);
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "El ID debe ser numérico.");
-            } catch (Exception ex) {
-                areaResultado.setText("Error en búsqueda: " + ex.getMessage());
-            }
-        });
-
-        // B. Botón Generar Mock Data (Requisito de Entrega)
-        btnGenerarDatos.addActionListener(e -> {
-            generarDatosPrueba();
-            // Actualizar la tabla del administrador automáticamente
-            panelAdminRef.actualizarTabla();
-            JOptionPane.showMessageDialog(this, "¡Se han generado y cargado 50 estudiantes de prueba!\nVerifique la pestaña 'Administración'.");
-        });
+        initUI();
     }
 
-    // Método para generar datos aleatorios
-    private void generarDatosPrueba() {
-        Random rand = new Random();
-        String[] nombres = {"Ana", "Carlos", "Sofia", "David", "Laura", "Jorge", "Valentina", "Andres"};
-        String[] apellidos = {"Perez", "Gomez", "Rodriguez", "Diaz", "Martinez", "Lopez", "Garcia"};
+    private void initUI() {
+        // PANEL SUPERIOR - Título
+        JLabel titulo = new JLabel("Panel de Estudiante", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 28));
+        titulo.setForeground(new Color(0, 100, 200));
+        add(titulo, BorderLayout.NORTH);
 
-        for (int i = 0; i < 50; i++) {
-            // Datos aleatorios
-            String nombre = nombres[rand.nextInt(nombres.length)] + " " + apellidos[rand.nextInt(apellidos.length)];
-            int pbm = rand.nextInt(100); // 0 a 99
-            int idBase = 1000 + rand.nextInt(9000); // ID entre 1000 y 9999
+        // PANEL CENTRAL - Formulario
+        JPanel panelForm = new JPanel(new GridBagLayout());
+        panelForm.setBorder(BorderFactory.createTitledBorder("Registrar Nuevo Estudiante"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-            // Asegurar unicidad simple para el ID en este loop (opcional)
-            int id = idBase + i;
+        // Nombre
+        gbc.gridx = 0; gbc.gridy = 0;
+        panelForm.add(new JLabel("Nombre:"), gbc);
+        gbc.gridx = 1;
+        nombreField = new JTextField(20);
+        panelForm.add(nombreField, gbc);
 
-            Estudiante est = new Estudiante(nombre, pbm, "est" + id + "@unal.edu.co");
-            est.setId(id);
+        // PBM
+        gbc.gridx = 0; gbc.gridy = 1;
+        panelForm.add(new JLabel("PBM (1-100):"), gbc);
+        gbc.gridx = 1;
+        pbmField = new JTextField(10);
+        panelForm.add(pbmField, gbc);
 
-            // Insertar en TODAS las estructuras
-            try {
-                minHeap.insert(est);
-                hashTable.insert(id, est);
-                avlTree.insert(est);
-            } catch (Exception ex) {
-                System.out.println("Error insertando mock: " + ex.getMessage());
+        // Correo
+        gbc.gridx = 0; gbc.gridy = 2;
+        panelForm.add(new JLabel("Correo:"), gbc);
+        gbc.gridx = 1;
+        correoField = new JTextField(20);
+        panelForm.add(correoField, gbc);
+
+        // Botones
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        JPanel panelBotones = new JPanel(new FlowLayout());
+
+        JButton btnInsertar = new JButton("➕ Insertar Estudiante");
+        btnInsertar.setBackground(new Color(50, 150, 50));
+        btnInsertar.setForeground(Color.WHITE);
+        btnInsertar.addActionListener(e -> insertarEstudiante());
+
+        JButton btnBuscar = new JButton("🔍 Buscar por PBM");
+        btnBuscar.setBackground(new Color(50, 100, 200));
+        btnBuscar.setForeground(Color.WHITE);
+        btnBuscar.addActionListener(e -> buscarPorPBM());
+
+        panelBotones.add(btnInsertar);
+        panelBotones.add(btnBuscar);
+        panelForm.add(panelBotones, gbc);
+
+        add(panelForm, BorderLayout.CENTER);
+
+        // PANEL INFERIOR - Resultados
+        JPanel panelResultado = new JPanel(new BorderLayout());
+        panelResultado.setBorder(BorderFactory.createTitledBorder("Resultados"));
+
+        resultadoArea = new JTextArea(10, 40);
+        resultadoArea.setEditable(false);
+        resultadoArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane scroll = new JScrollPane(resultadoArea);
+
+        panelResultado.add(scroll, BorderLayout.CENTER);
+
+        // Botón para listar todos
+        JButton btnListar = new JButton("📋 Listar Todos los Estudiantes");
+        btnListar.addActionListener(e -> listarEstudiantes());
+        panelResultado.add(btnListar, BorderLayout.SOUTH);
+
+        add(panelResultado, BorderLayout.SOUTH);
+    }
+
+    private void insertarEstudiante() {
+        try {
+            String nombre = nombreField.getText().trim();
+            String correo = correoField.getText().trim();
+            int pbm = Integer.parseInt(pbmField.getText().trim());
+
+            if (nombre.isEmpty() || correo.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nombre y correo son obligatorios");
+                return;
             }
+
+            if (pbm < 1 || pbm > 100) {
+                JOptionPane.showMessageDialog(this, "PBM debe estar entre 1 y 100");
+                return;
+            }
+
+            Estudiante nuevo = new Estudiante(nombre, pbm, correo);
+            arbol.insertar(nuevo);
+
+            resultadoArea.append("✅ Estudiante insertado: " + nuevo + "\n");
+            limpiarCampos();
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "PBM debe ser un número", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void buscarPorPBM() {
+        try {
+            int pbm = Integer.parseInt(JOptionPane.showInputDialog(this, "Ingrese PBM a buscar:"));
+
+            // Crear temporal para búsqueda
+            Estudiante temp = new Estudiante("", pbm, "");
+            Estudiante encontrado = arbol.buscar(temp);
+
+            if (encontrado != null) {
+                resultadoArea.append("🔍 Encontrado: " + encontrado + "\n");
+            } else {
+                resultadoArea.append("❌ No se encontró estudiante con PBM=" + pbm + "\n");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "PBM inválido", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void listarEstudiantes() {
+        resultadoArea.setText("");
+        resultadoArea.append("LISTA DE ESTUDIANTES (Ordenados por PBM)\n");
+        resultadoArea.append("===========================================\n");
+        resultadoArea.append(arbol.listarPrioridad());
+        resultadoArea.append("\nTotal: " + arbol.totalNodos() + " estudiantes\n");
+    }
+
+    private void limpiarCampos() {
+        nombreField.setText("");
+        pbmField.setText("");
+        correoField.setText("");
     }
 }
